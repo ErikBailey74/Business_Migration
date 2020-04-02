@@ -13,7 +13,7 @@ namespace Business_Migration
     {
 
 
-        static string contact_connectionString = "Data Source=EBAILEY;Initial Catalog=Contacts;Integrated Security=True";
+        static string contact_connectionString = "Data Source=EBAILEY;Initial Catalog=Contacts_SecondPass;User ID=sa;Password=M3lb0urn3";
 
         static void Main()
         {
@@ -43,7 +43,8 @@ namespace Business_Migration
                     source.Company_Name = con_rdr["company_name"].ToString();
                     source.BTR_IDs = con_rdr["btr_ids"].ToString();
                     source.ENG_IDs = con_rdr["eng_ids"].ToString();
-                    source.CODE_IDs = con_rdr["code_ids"].ToString();
+                    source.CODE_IDs = con_rdr["cont_ids"].ToString();
+                    source.building_id = con_rdr["building_ids"].ToString();
                     contacts.Add(source);
                 }
 
@@ -217,6 +218,9 @@ namespace Business_Migration
                         Note_User = "",
                         Note_Date = ""
                     };
+
+
+
                     /*
                     Business_Parcel business_parcel = new Business_Parcel()
                     {
@@ -225,10 +229,22 @@ namespace Business_Migration
                         Main_Parcel = true
                     };*/
 
+                    /*
+                    //Business Additional Fields
+                    Business_Additional_Fields business_additional_fields = new Business_Additional_Fields
+                    {
+                        Business_ID = ReturnFormattedID(Globals.counter),
+                        Exemptions = bus_rdr["Exemption"].ToString(),
+                        NewHomeBasedBusiness  = bus_rdr["NewHomeBasedBusiness"].ToString(),
+                        NotForProfitBusiness = bus_rdr["NotForProfitBusiness"].ToString(),
+                        OfAdditionalClassifications = Convert.ToDecimal(bus_rdr["OfAdditionalClassifications"])
+                    };*/
+
                     InsertBusiness(business);
                     InsertBusinessAddress(business_address);
                     // InsertBusinessParcel(business_parcels);
                     InsertBusinessNote(business_note);
+                   // InsertBusinessAdditionalFields(business_additional_fields);
                 }
             } 
         }
@@ -366,6 +382,36 @@ namespace Business_Migration
                     Console.WriteLine("Error writing Business Note with ID: " + business_note.Business_ID);
                 }
                 
+            }
+        }
+
+        static void InsertBusinessAdditionalFields(Business_Additional_Fields business_additional_field)
+        {
+            using (SqlConnection con = new SqlConnection(contact_connectionString))
+            {
+
+                SqlCommand cmd = new SqlCommand("AddBusinessAdditionalFields", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@business_id", business_additional_field.Business_ID);
+                cmd.Parameters.AddWithValue("@Exemptions", business_additional_field.Exemptions);
+                cmd.Parameters.AddWithValue("@NewHomeBasedBusiness", business_additional_field.NewHomeBasedBusiness);
+                cmd.Parameters.AddWithValue("@NotForProfitBusiness", business_additional_field.NotForProfitBusiness);
+                cmd.Parameters.AddWithValue("@OfAdditionalClassifications", business_additional_field.OfAdditionalClassifications);
+                
+
+                con.Open();
+                int j = cmd.ExecuteNonQuery();
+                con.Close();
+
+                if (j >= 1)
+                {
+                    Console.WriteLine("Sucessfully wrote Business Additional Field with ID: " + business_additional_field.Business_ID);
+                }
+                else
+                {
+                    Console.WriteLine("Error writing Business Additional Field with ID: " + business_additional_field.Business_ID);
+                }
+
             }
         }
 

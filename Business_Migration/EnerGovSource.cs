@@ -11,5 +11,6 @@ namespace Business_Migration
         public string BTR_IDs { get; set; }
         public string ENG_IDs { get; set; }
         public string CODE_IDs { get; set; }
+        public string building_id { get; set; }
     }
 }
